@@ -1,0 +1,26 @@
+# === Python ===
+__pycache__/
+# === Виртуальное окружение ===
+venv/
+env/
+ENV/
+.venv
+# === Pytest ===
+.pytest_cache/
+.cache
+.pytest_cache/
+
+# === Allure ===
+allure-results/
+allure-report/
+allure-2.29.0/
+allure-2.29.0.tgz
+
+# === Environment variables ===
+.env
+.env.local
+*.env
+
+# === Logs ===
+*.log
+logs/

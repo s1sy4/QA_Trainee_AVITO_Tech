@@ -61,8 +61,6 @@ class TestRaceConditions:
             allure.attach(
                 str(status_codes), name="Status Codes", attachment_type=allure.attachment_type.TEXT
             )
-
-            # Собираем ID созданных объявлений
             created_item_ids = []
             for resp in created_responses:
                 if resp.status_code in [200, 201]:
@@ -89,8 +87,6 @@ class TestRaceConditions:
                     name="Result",
                     attachment_type=allure.attachment_type.TEXT,
                 )
-
-            # Вариант 2: Одно создано, второе отклонено (тоже допустимо)
             elif len(created_item_ids) == 1:
                 success_count = sum(1 for code in status_codes if code in [200, 201])
                 assert success_count == 1, "Ожидали ровно 1 успешный ответ"
@@ -190,8 +186,6 @@ class TestPerformance:
                 assert (
                     created["name"] in returned_names
                 ), f"Объяление '{created['name']}' не найдено в списке продавца"
-
-            # Проверяем, что количество возвращённых объявлений не меньше созданного
             assert (
                 len(items_list) >= NUM_ITEMS
             ), f"Ожидали минимум {NUM_ITEMS} объявлений, получили {len(items_list)}"
