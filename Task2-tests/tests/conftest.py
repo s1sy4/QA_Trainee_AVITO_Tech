@@ -52,3 +52,58 @@ def api_client():
             session.delete(f"{BASE_URL}/2/item/{item_id}")
         except requests.exceptions.RequestException:
             pass 
+
+@pytest.fixture
+def second_api_client():
+    """Вторая независимая фикстура для тестов с двумя пользователями"""
+    session = requests.Session()
+    
+    unique_username = f"user2_{uuid.uuid4().hex[:8]}"
+    password = "TestPassword123!"
+    
+    # Регистрация второго пользователя
+    reg_resp = session.post(f"{BASE_URL}/1/register", json={
+        "username": unique_username,
+        "password": password
+    })
+    assert reg_resp.status_code in [200, 201]
+    user_id = reg_resp.json()["id"]
+    
+    # Авторизация
+    auth_resp = session.post(f"{BASE_URL}/1/autorize", json={
+        "username": unique_username,
+        "password": password
+    })
+    assert auth_resp.status_code == 200
+    token = auth_resp.json()["accessToken"]
+    
+    session.headers.update({"Authorization": f"Bearer {token}"})
+    
+    created_items = []
+    
+    def create_item(payload: dict):
+        payload["sellerId"] = int(user_id)
+        resp = session.post(f"{BASE_URL}/1/item", json=payload)
+        if resp.status_code in [200, 201]:
+            item_id = resp.json()["status"].split(" - ")[1]
+            created_items.append(item_id)
+        return resp
+    
+    yield {
+        "session": session,
+        "user_id": user_id,
+        "token": token,
+        "create_item": create_item
+    }
+    
+    # Teardown для второго пользователя
+    for item_id in created_items:
+        try:
+            session.delete(f"{BASE_URL}/2/item/{item_id}")
+        except Exception:
+            pass
+
+@pytest.fixture(scope="function")
+def fresh_session():
+    """Фикстура для создания чистой сессии без токена"""
+    return requests.Session()

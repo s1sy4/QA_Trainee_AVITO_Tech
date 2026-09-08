@@ -46,7 +46,7 @@
 
 | TC-ID | Эндпоинт | Сценарий | Предусловия | Шаги | Ожидаемый результат |
 |-------|----------|----------|-------------|------|---------------------|
-| **SEC-001** | `POST /api/1/item` | SQL-инъекция в поле name | Пользователь авторизован | 1. Отправить `POST /api/1/item` с телом `{name: "'; DROP TABLE items; --", price: 100, sellerID: <userId>}` | 201 Created (данные экранированы) **или** 400 Bad Request (валидация входных данных); база данных не должна быть повреждена |
+| **SEC-001** | `POST /api/1/item` | SQL-инъекция в поле name | Пользователь авторизован | 1. Отправить `POST /api/1/item` с телом `{name: "' OR 1=1 --", description: "'" ,price: 100, sellerID: <userId>}` | 200 OK (данные экранированы) **или** 400 Bad Request (валидация входных данных); база данных не должна быть повреждена |
 | **SEC-002** | `POST /api/1/register` | Регистрация с уже существующим username | Пользователь с таким username уже существует | 1. Использовать `username` ранее зарегистрированного пользователя<br>2. Отправить `POST /api/1/register` с тем же `{username, password}` | 409 Conflict **или** 400 Bad Request; сообщение `"Username already exists"` |
 | **SEC-003** | `POST /api/1/autorize` | Авторизация с неверным паролем | Пользователь зарегистрирован | 1. Отправить `POST /api/1/autorize` с `{username: "valid_user", password: "wrong_password"}` | 401 Unauthorized; сообщение `"Invalid credentials"` |
 
