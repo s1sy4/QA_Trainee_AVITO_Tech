@@ -1,7 +1,8 @@
-import pytest
-import allure
 import uuid
-from conftest import BASE_URL, api_client
+
+import allure
+from conftest import BASE_URL
+
 
 @allure.epic("API Tests")
 @allure.feature("Items")
@@ -16,17 +17,13 @@ def test_should_create_and_delete_item_when_user_is_authorized(api_client):
         "name": item_name,
         "description": "E2E test item",
         "price": 5000,
-        "sellerId": int(api_client["user_id"]), 
-        "statistics": {                         
-            "contacts": 43,
-            "likes": 21,
-            "viewCount": 11
-        }
+        "sellerId": int(api_client["user_id"]),
+        "statistics": {"contacts": 43, "likes": 21, "viewCount": 11},
     }
-    
+
     with allure.step("Создание item через POST /api/1/item"):
         create_resp = api_client["create_item"](payload)
-    
+
     with allure.step("Подтверждаем создание и проверяем данные через GET"):
         assert create_resp.status_code in [200, 201], f"Ошибка создания: {create_resp.text}"
 
@@ -37,7 +34,9 @@ def test_should_create_and_delete_item_when_user_is_authorized(api_client):
         assert get_resp.status_code == 200, f"Не удалось получить объявление: {get_resp.text}"
 
         item_from_api = get_resp.json()
-        assert item_from_api[0]["sellerId"] == api_client["user_id"], f"sellerId не совпадает с userId"
+        assert (
+            item_from_api[0]["sellerId"] == api_client["user_id"]
+        ), "sellerId не совпадает с userId"
         assert get_resp.json()[0]["name"] == item_name
         assert get_resp.json()[0]["price"] == 5000
 

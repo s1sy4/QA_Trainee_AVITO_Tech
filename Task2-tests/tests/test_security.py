@@ -1,5 +1,5 @@
-import pytest
 import uuid
+
 import allure
 import requests
 from conftest import BASE_URL
@@ -20,23 +20,23 @@ class TestSecurityScenarios:
             "description": desc,
             "price": 100,
             "sellerId": int(api_client["user_id"]),
-            "statistics": {"contacts": 1, "likes": 1, "viewCount": 1}
+            "statistics": {"contacts": 1, "likes": 1, "viewCount": 1},
         }
-        
+
         with allure.step("Отправляем POST /api/1/item с валидными данными"):
             create_resp = api_client["create_item"](payload)
-        
+
         with allure.step("Проверяем статус 200/400"):
             assert create_resp.status_code in [200, 400], f"Ошибка создания: {create_resp.text}"
 
         with allure.step("Извлекаем ID созданного объявления"):
             item_id = create_resp.json()["status"].split(" - ")[1]
             assert item_id, "ID объявления не найден в ответе"
-                
+
         with allure.step("Получаем объявление через GET и проверяем все поля"):
             get_resp = api_client["session"].get(f"{BASE_URL}/1/item/{item_id}")
             assert get_resp.status_code == 200, f"Не удалось получить объявление: {get_resp.text}"
-            
+
             item_data = get_resp.json()[0]
 
             assert item_data["name"] == item_name, f"Название не совпадает, {item_data}"
@@ -51,15 +51,17 @@ class TestSecurityScenarios:
 
         with allure.step("Регистрируем первого пользователя"):
             resp1 = requests.post(f"{BASE_URL}/1/register", json=register_payload)
-            assert resp1.status_code in [200, 201], \
-                f"Ошибка регистрации первого пользователя: {resp1.text}"
+            assert resp1.status_code in [
+                200,
+                201,
+            ], f"Ошибка регистрации первого пользователя: {resp1.text}"
 
         with allure.step("Пытаемся зарегистрировать второго пользователя с тем же username"):
             resp2 = requests.post(f"{BASE_URL}/1/register", json=register_payload)
 
         with allure.step("Проверяем, что получен статус 409(дубликат username)"):
-            assert resp2.status_code == 409, \
-                f"Ожидался статус 409 для дубликата username, но получен {resp2.status_code}. Ответ: {resp2.text}"
+            assert resp2.status_code == 409, f"Ожидался статус 409 для дубликата username, \
+                но получен {resp2.status_code}. Ответ: {resp2.text}"
 
     @allure.title("SEC-003: Авторизация с неверным паролем")
     def test_authorize_with_wrong_password_returns_401(self):
@@ -73,8 +75,10 @@ class TestSecurityScenarios:
 
         with allure.step("Регистрируем нового пользователя"):
             resp_register = requests.post(f"{BASE_URL}/1/register", json=register_payload)
-            assert resp_register.status_code in [200, 201], \
-                f"Ошибка регистрации: {resp_register.text}"
+            assert resp_register.status_code in [
+                200,
+                201,
+            ], f"Ошибка регистрации: {resp_register.text}"
 
         auth_payload = {"username": unique_username, "password": wrong_password}
 
@@ -82,5 +86,5 @@ class TestSecurityScenarios:
             resp_auth = requests.post(f"{BASE_URL}/1/autorize", json=auth_payload)
 
         with allure.step("Проверяем, что получен статус 401 Unauthorized"):
-            assert resp_auth.status_code == 401, \
-                f"Ожидался статус 401 для неверного пароля, но получен {resp_auth.status_code}. Ответ: {resp_auth.text}"
+            assert resp_auth.status_code == 401, f"Ожидался статус 401 для неверного пароля, \
+                но получен {resp_auth.status_code}. Ответ: {resp_auth.text}"
