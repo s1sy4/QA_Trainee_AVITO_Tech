@@ -74,6 +74,7 @@ pytest Task2-tests/tests/ -vvs
 
 ```
 .
+├── Task1-imgs/                  # Скриншоты багов из задания 1
 ├── Task2-tests/
 │   ├── conftest.py              # Фикстуры (api_client, second_api_client)
 │   ── tests/
@@ -89,8 +90,9 @@ pytest Task2-tests/tests/ -vvs
 ├── PROMPTS.md                   # История использования ИИ
 ├── TESTCASES.md                 # Таблица тест-кейсов
 ├── pyproject.toml               # Конфигурация линтера/форматтера
-├── requirements.txt             # Зависимости
-└── README.md
+├── requirements.txt             # Зависимости  
+├── README.md
+└── TASK1.md                     # Оформленное решение Задания 1
 ```
 
 ## Архитектура тестов
